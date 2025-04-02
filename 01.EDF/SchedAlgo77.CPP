@@ -23,3 +23,25 @@ int roundRobin( )
 }
 
 
+int edf()
+{
+	int nextTask = -1;
+	unsigned int earliestDeadline = MAXINT:
+
+	for(int i = 0; i < SMARTS.getTotalTasks(); ++i)
+	{
+		// get all the task that are in the ready state
+		if(SMARTS.getStatus(i) == READY)
+		{
+			// get the task with the earliest deadline
+			if(SMARTS.getDeadline(i) < earliestDeadline)
+			{
+				earliestDeadline = SMARTS.getDeadline(i);
+				nextTask = i;
+			}
+		}
+	}
+
+	return (nextTask == -1) ? SMARTS.getTotalTasks() : nextTask;
+}
+

@@ -47,17 +47,40 @@ void Parallelism::externalFunctions(void interrupt ( *timerInterruptHandler)(...
 		schedCopy[i]=contextSched.stack[i];
 }
 
-int Parallelism::declareTask(void far *code, char name)
-		// Insert a new task entry in SMARTS context array [ ]
+// int Parallelism::declareTask(void far *code, char name)
+// 		// Insert a new task entry in SMARTS context array [ ]
+// {
+// 	if (totalTasks < MaxTask-1) 
+// 	{
+// 		context[totalTasks++].declare(code, userTaskEnd, name);
+// 		++activeTasks;
+// 		return true;
+// 	}
+// 	else	
+// 		return false;
+// }
+
+int Parallelism::declareTask(void far *code, char name, int deadline, int remainingTime)
 {
-	if (totalTasks < MaxTask-1) 
+	if(totalTasks < MaxTask-1) 
 	{
-		context[totalTasks++].declare(code, userTaskEnd, name);
+		context[totalTasks].declare(code, userTaskEnd, name, deadline, remainingTime);
 		++activeTasks;
+		++totalTasks;
 		return true;
 	}
 	else	
 		return false;
+}
+
+int getRemainingTime(int taskNum)
+{
+	if (taskNum < MaxTask-1) 
+	{
+		return SMARTS.context[taskNum].remainingTime;
+	}
+	else	
+		return -1;
 }
 
 void Parallelism::runTheTasks()
@@ -352,7 +375,18 @@ Task::Task()
 	currentPriority=priority=0;
 }
 //-----------------------------------------------------
-void Task::declare(void far *code, void far *userTaskEnd, char name)
+// void Task::declare(void far *code, void far *userTaskEnd, char name)
+// {
+// 	stack[MaxStack-5]=FP_OFF(code);
+// 	stack[MaxStack-4]=FP_SEG(code);
+// 	stack[MaxStack-3]=_FLAGS;
+// 	stack[MaxStack-2]=FP_OFF(userTaskEnd);
+// 	stack[MaxStack-1]=FP_SEG(userTaskEnd);
+// 	this->name= name;
+// 	status = READY;
+// }
+
+void Task::declare(void far *code, void far *userTaskEnd, char name, int cycles, int cycleTime);
 {
 	stack[MaxStack-5]=FP_OFF(code);
 	stack[MaxStack-4]=FP_SEG(code);
@@ -360,7 +394,18 @@ void Task::declare(void far *code, void far *userTaskEnd, char name)
 	stack[MaxStack-2]=FP_OFF(userTaskEnd);
 	stack[MaxStack-1]=FP_SEG(userTaskEnd);
 	this->name= name;
+	this->remainingCycles = cycles;
+	this->remainingTime = cycleTime;
+	this->cycleTime = cycleTime;
 	status = READY;
+}
+
+void Task::reDeclare()
+{
+	// make the reaming cycle to be the original cycle
+	remainingCycles--;
+	remainingTime = cycleTime;
+	
 }
 //----------------------------------------------------
 void Task::incrPriority( )

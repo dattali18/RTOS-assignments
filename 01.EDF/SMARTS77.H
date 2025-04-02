@@ -56,11 +56,16 @@ public:
 	Event *expectedEvent;           // the event that this task is waiting for
 	int sleepCount;                 // the sleep remainder time
 	Task();
-	void declare(void far *code, void far *taskEnd, char name);
+	// void declare(void far *code, void far *taskEnd, char name);
 	void sleepDecr();
 	void incrPriority();
 	void setOriginalPriority();
-
+	/// addition for tar1
+	int remainingCycles;
+	int cycleTime;
+	int remainingTime;
+	void declare(void far *code, void far *userTaskEnd, char name, int cycles, int cycleTime);
+	void reDeclare();
 };
 //                           Main class
 class Parallelism
@@ -94,7 +99,7 @@ public:
 	void externalFunctions(void interrupt ( *timerInterruptHandler)(...),
 				   void far *scheduler, void far *userTaskEnd,
 				   int far (*algorithm)());
-	int declareTask(void far *code, char name); // inserts a new task entry
+	// int declareTask(void far *code, char name); // inserts a new task entry
 	void runTheTasks();// start running the tasks
 	void callScheduler();          // return to the control to the scheduler
 	void restoreSchedStack();       // restore the 'scheduler' stack
@@ -131,6 +136,9 @@ public:
 	void getSchedStack(unsigned &StackSeg, unsigned &StackPtr);
 	void handleTimers();
 	void taskEnd();
+	/// addition for tar1
+	void declareTask(void far *code, char name, int deadline, int remainingTime);
+	int getRemainingTime(int taskNum);
 };
 //=======================
 /**********    Functions    **********/
@@ -142,6 +150,7 @@ void scheduler();
 void myTaskEnd();
 	// 'short term' scheduler algorithms 
 int roundRobin();
+int edf();
 	// main scheduler object
 extern Parallelism SMARTS;
 
