@@ -26,7 +26,7 @@ int roundRobin( )
 int edf()
 {
 	int nextTask = -1;
-	unsigned int earliestDeadline = MAXINT:
+	unsigned int earliestDeadline = MAXINT;
 
 	for(int i = 0; i < SMARTS.getTotalTasks(); ++i)
 	{

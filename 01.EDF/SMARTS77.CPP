@@ -73,7 +73,7 @@ int Parallelism::declareTask(void far *code, char name, int deadline, int remain
 		return false;
 }
 
-int getRemainingTime(int taskNum)
+int Parallelism::getRemainingTime(int taskNum)
 {
 	if (taskNum < MaxTask-1) 
 	{
@@ -81,6 +81,42 @@ int getRemainingTime(int taskNum)
 	}
 	else	
 		return -1;
+}
+
+int Parallelism::getRemainingCycles(int taskNum)
+{
+	if (taskNum < MaxTask-1) 
+	{
+		return SMARTS.context[taskNum].remainingCycles;
+	}
+	else	
+		return -1;
+}
+
+int Parallelism::getCycleTime(int taskNum)
+{
+	if (taskNum < MaxTask-1) 
+	{
+		return SMARTS.context[taskNum].cycleTime;
+	}
+	else	
+		return -1;
+}
+
+void Parallelism::updateDeadlines()
+{
+	for (int i=totalTasks-1; i >=0 ; --i) 
+	{	
+		if(getStatus(i)==READY)
+		{
+			context[i].remainingTime--;
+			if (context[i].remainingTime <= 0)
+			{
+				context[i].remainingCycles--;
+				context[i].remainingTime = context[i].cycleTime;
+			}
+		}
+	}
 }
 
 void Parallelism::runTheTasks()
@@ -386,7 +422,7 @@ Task::Task()
 // 	status = READY;
 // }
 
-void Task::declare(void far *code, void far *userTaskEnd, char name, int cycles, int cycleTime);
+void Task::declare(void far *code, void far *userTaskEnd, char name, int cycles, int cycleTime)
 {
 	stack[MaxStack-5]=FP_OFF(code);
 	stack[MaxStack-4]=FP_SEG(code);

@@ -48,6 +48,11 @@ void far interrupt timerInterruptHandler(...)
 //		SMARTS.setEndOfTimeSlice();
 //		++SMARTS.TScount;	// increment Time Share count
 //	}
+
+	// addition for tar1
+	// update the reamining time of the current task
+	SMARTS.getCurrentTask().remainingTime--;
+	// 
 }
 /**********    EXTERNAL FUNCTION     **********/
 void scheduler( )	// this also a parallel task

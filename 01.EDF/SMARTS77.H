@@ -61,11 +61,20 @@ public:
 	void incrPriority();
 	void setOriginalPriority();
 	/// addition for tar1
+private:
 	int remainingCycles;
 	int cycleTime;
 	int remainingTime;
+public:
 	void declare(void far *code, void far *userTaskEnd, char name, int cycles, int cycleTime);
 	void reDeclare();
+
+	int getRemainingCycles() { return remainingCycles; }
+	int getRemainingTime() { return remainingTime; }
+	int getCycleTime() { return cycleTime; }
+	void setRemainingCycles(int cycles) { remainingCycles = cycles; }
+	void setRemainingTime(int time) { remainingTime = time; }
+	void setCycleTime(int time) { cycleTime = time; }
 };
 //                           Main class
 class Parallelism
@@ -139,6 +148,10 @@ public:
 	/// addition for tar1
 	void declareTask(void far *code, char name, int deadline, int remainingTime);
 	int getRemainingTime(int taskNum);
+	int getRemainingCycles(int taskNum);
+	int getCycleTime(int taskNum);
+	// functoin to decrease the remove 1 to all the tasks deadlines
+	void updateDeadlines();
 };
 //=======================
 /**********    Functions    **********/
