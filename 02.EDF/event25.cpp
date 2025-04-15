@@ -8,19 +8,19 @@ Event::Event()
 void Event::send(char name, void *param, int synch)
 {
 	int i;
-	while(testAndSet( ))
-		SMARTS.callScheduler( );
+	while(testAndSet())
+		SMARTS.callScheduler();
 
-	source = SMARTS.getCurrentName( );
+	source = SMARTS.getCurrentName();
 	data = param;
 
-	for (i=SMARTS.getTotalTasks()-1; i>=0; --i)
+	for (i = SMARTS.getTotalTasks() - 1; i >= 0; --i)
 		if (SMARTS.getName(i) == name)
 			break;
 
-	if (i>=0) 
+	if (i >= 0) 
 	{
-		if (SMARTS.getStatus(i)==SUSPENDED && SMARTS.getExpectedEvent(i)==this)
+		if (SMARTS.getStatus(i) == SUSPENDED && SMARTS.getExpectedEvent(i) == this)
 			SMARTS.resume(i);
 		if (synch) 
 		{
@@ -68,10 +68,10 @@ void Event::reset()
 int Event::testAndSet()
 {
 	int tmp;
-	SMARTS.contextSwitchOff( );
+	SMARTS.contextSwitchOff();
 	tmp = flag;
 	flag = true;
-	SMARTS.contextSwitchOn( );
+	SMARTS.contextSwitchOn();
 	return tmp;
 }
 

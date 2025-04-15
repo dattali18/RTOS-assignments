@@ -1,7 +1,7 @@
 #include "smarts25.h"
 
 // user Functions
-void a( )
+void a()
 {
 	SMARTS.contextSwitchOff();
 	cout << "\n *************   A Start    *********************";
@@ -18,7 +18,7 @@ void a( )
 	SMARTS.contextSwitchOn();
 }
 
-void b( )
+void b()
 {
 	SMARTS.contextSwitchOff();
 	cout << "\n *************   B Start    *********************";
@@ -35,7 +35,7 @@ void b( )
 	SMARTS.contextSwitchOn();
 }
 
-void c( )
+void c()
 {
 	SMARTS.contextSwitchOff();
 	cout << "\n *************   C Start    *********************";
@@ -52,13 +52,13 @@ void c( )
 	SMARTS.contextSwitchOn();
 }
 
-void main( )
+void main()
 {
 	clrscr();
-	SMARTS.externalFunctions(timerInterruptHandler, scheduler, myTaskEnd, roundRobin);
-	SMARTS.declareTask(a,'A');
-	SMARTS.declareTask(b,'B');
-	SMARTS.declareTask(c,'C');
+	SMARTS.externalFunctions(timerInterruptHandler, scheduler, myTaskEnd, edf);
+	SMARTS.declareTask(a,'A', 5, 3);
+	SMARTS.declareTask(b,'B', 7, 4);
+	SMARTS.declareTask(c,'C', 10, 5);
 	SMARTS.runTheTasks();
 }
 

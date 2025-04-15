@@ -49,13 +49,13 @@ void scheduler()
 	int nextTask, i;
 
 	// calling to the 'short term scheduler' algorithm
-	nextTask = SMARTS.algorithm( );
+	nextTask = SMARTS.algorithm();
 
 		// checking for 'deadlock' : not found task to run and tasks remain suspended
 	if (nextTask == SMARTS.getTotalTasks() && 
-			SMARTS.sleepTasks==0 && SMARTS.activeTasks>0)
+			SMARTS.sleepTasks == 0 && SMARTS.activeTasks > 0)
 	{
-		for (i=SMARTS.getTotalTasks()-1; i >= 0 ; --i)
+		for (i=SMARTS.getTotalTasks() - 1; i >= 0 ; --i)
 			if (SMARTS.getStatus(i) == SUSPENDED) 
 			{
 				cprintf("\ntask %c  is suspended",SMARTS.getName(i)) ;

@@ -72,6 +72,8 @@ public:
 	// redefining the declare function to include the deadline and cycles
 	void declare(void far* code, void far* taskEnd, char name, int deadline, int cycles);
 
+	void redclare();
+
 	/// **** End of Addition ****
 };
 
@@ -151,6 +153,8 @@ public:
 	void declareTask(void far* code, char name, int deadline, int cycles);
 
 	int getTaskDeadline(int taskNum);
+
+	void redeclareTask(int taskNum);
 
 	void updateDeadlines();
 

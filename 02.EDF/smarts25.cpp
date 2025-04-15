@@ -3,7 +3,6 @@
 unsigned getTimerClocks( )
 {
 	// Gets the remaining clocks of the timer register
-
 	unsigned clocks;
 	/* latch counter #0 */
 	outportb(0x43,0x00);
@@ -85,6 +84,14 @@ void Parallelism::updateDeadlines()
 	}
 }
 
+void Parallelism::redeclareTask(int taskNum) {
+	if (taskNum < totalTasks) {
+		context[taskNum].redclare();
+	}
+	else {
+		// Handle error: taskNum is out of range
+	}
+}
 
 /// **** End of Addition ****
 
@@ -405,6 +412,17 @@ void Task::declare(void far* code, void far* userTaskEnd, char name, int deadlin
 	this->deadline = deadline;
 	this->originalDeadline = deadline;
 	this->cycles = cycles;
+}
+
+void Task::redclare()
+{
+	// Redefine the task with the original deadline and cycles
+	deadline = originalDeadline;
+	if (cycles > 1)
+		cycles = cycles - 1;
+	else
+		// If the task has finished its cycles, set it to NOT_ACTIVE
+		status = NOT_ACTIVE;
 }
 
 /// **** End of Addition ****
