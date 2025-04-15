@@ -72,7 +72,7 @@ public:
 	// redefining the declare function to include the deadline and cycles
 	void declare(void far* code, void far* taskEnd, char name, int deadline, int cycles);
 
-	void redclare();
+	int redclare();
 
 	/// **** End of Addition ****
 };

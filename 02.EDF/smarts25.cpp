@@ -88,9 +88,6 @@ void Parallelism::redeclareTask(int taskNum) {
 	if (taskNum < totalTasks) {
 		context[taskNum].redclare();
 	}
-	else {
-		// Handle error: taskNum is out of range
-	}
 }
 
 /// **** End of Addition ****
@@ -243,7 +240,7 @@ char Parallelism::getCurrentName()
 taskStatus Parallelism::getStatus(int taskNum)  	
 {
 	// returns status or undefined if not found
-	return (taskNum <= totalTasks)? context[taskNum].status : UNDEFINED;
+	return (taskNum <= totalTasks) ? context[taskNum].status : UNDEFINED;
 }
 
 taskStatus Parallelism::getCurrentStatus()
@@ -295,7 +292,7 @@ void Parallelism::setCurrentOriginalPriority()
 Event *Parallelism::getExpectedEvent(int taskNum)    
 {	
 	// returns *Event  or  NULL  if not found
-	return (taskNum <= totalTasks)? context[taskNum].expectedEvent : NULL;
+	return (taskNum <= totalTasks) ? context[taskNum].expectedEvent : NULL;
 }
 
 Event *Parallelism::getCurrentExpectedEvent()
@@ -313,7 +310,7 @@ void Parallelism::sleep(int t)
 	// Current task sleeps for 't' milliseconds
 	if (t < MAXINT) 
 	{
-		context[currentTask].sleepCount = t/55+1;
+		context[currentTask].sleepCount = t / 55 + 1;
 		context[currentTask].status = SLEEP;
 		++sleepTasks;
 		callScheduler();		// return control to scheduler
@@ -350,9 +347,9 @@ void Parallelism::getSchedStack(unsigned &StackSeg, unsigned &StackPtr)
 void Parallelism::handleTimers()
 {
 	// handling of the sleep status mode
-	for (int i=totalTasks-1; i >=0 ; --i) 
+	for (int i = totalTasks - 1; i >= 0 ; --i) 
 	{	
-		if(getStatus(i)==SLEEP)
+		if(getStatus(i) == SLEEP)
 		{
 			sleepDecr(i);
 			if (getStatus(i) == READY)
@@ -364,8 +361,21 @@ void Parallelism::handleTimers()
 
 void Parallelism::taskEnd()
 {
+	// redeclare current task
+	int currentTask = getCurrentTask();
+	// redeclare the task
+	if (SMARTS.redeclareTask(currentTask))
+	{
+		// task is still active
+		context[currentTask].status = READY;
+	}
+	else
+	{
+		// task is not active anymore
+		context[currentTask].status = NOT_ACTIVE;
+	}
 	// This function is called after the last operation of a task, instead of function return
-	SMARTS.setCurrentNotActive();
+	//SMARTS.setCurrentNotActive();
 	SMARTS.callScheduler();	// return the control to the scheduler to run a next task
 }
 
@@ -414,15 +424,19 @@ void Task::declare(void far* code, void far* userTaskEnd, char name, int deadlin
 	this->cycles = cycles;
 }
 
-void Task::redclare()
+int Task::redclare()
 {
 	// Redefine the task with the original deadline and cycles
 	deadline = originalDeadline;
 	if (cycles > 1)
+	{
 		cycles = cycles - 1;
+		return 1; // Task is still active
+	}
 	else
-		// If the task has finished its cycles, set it to NOT_ACTIVE
-		status = NOT_ACTIVE;
+	{
+		return 0; // Task is not active anymore
+	}
 }
 
 /// **** End of Addition ****

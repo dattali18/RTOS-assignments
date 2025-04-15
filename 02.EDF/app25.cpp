@@ -6,9 +6,9 @@ void a()
 	SMARTS.contextSwitchOff();
 	cout << "\n *************   A Start    *********************";
 	SMARTS.contextSwitchOn();
-	for (int j=0; j <500; j++)
+	for (int j = 0; j < 500; j++)
 	{
-		for (long i=0; i <600000; i++);
+		for (long i = 0; i < 600000; i++);
 		SMARTS.contextSwitchOff();
 		cout << "A";
 		SMARTS.contextSwitchOn();
@@ -23,9 +23,9 @@ void b()
 	SMARTS.contextSwitchOff();
 	cout << "\n *************   B Start    *********************";
 	SMARTS.contextSwitchOn();
-	for (int j=0; j <500; j++)
+	for (int j = 0; j < 500; j++)
 	{
-		for (long i=0; i < 600000; i++);
+		for (long i = 0; i < 600000; i++);
 		SMARTS.contextSwitchOff();
 		cout << "B";
 		SMARTS.contextSwitchOn();
@@ -40,9 +40,9 @@ void c()
 	SMARTS.contextSwitchOff();
 	cout << "\n *************   C Start    *********************";
 	SMARTS.contextSwitchOn();
-	for (int j=0; j <500; j++)
+	for (int j = 0; j < 500; j++)
 	{
-		for (long i=0; i < 600000; i++);
+		for (long i = 0; i < 600000; i++);
 		SMARTS.contextSwitchOff();
 		cout << "C";
 		SMARTS.contextSwitchOn();

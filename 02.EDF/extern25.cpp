@@ -48,6 +48,10 @@ void scheduler()
 	// It selects & switches the next task to be run.
 	int nextTask, i;
 
+	/// **** Addition to the original code ****
+	SMARTS.updateDeadlines(); // Update the deadlines of all tasks
+	/// **** End of Addition ****
+
 	// calling to the 'short term scheduler' algorithm
 	nextTask = SMARTS.algorithm();
 
