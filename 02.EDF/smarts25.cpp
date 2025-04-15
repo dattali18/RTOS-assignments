@@ -40,18 +40,53 @@ void Parallelism::externalFunctions(void interrupt ( *timerInterruptHandler)(...
 		schedCopy[i]=contextSched.stack[i];
 }
 
-int Parallelism::declareTask(void far *code, char name)
+/// **** Addition to the original code ****
+
+//int Parallelism::declareTask(void far *code, char name)
+//{
+//	// Insert a new task entry in SMARTS context array [ ]
+//	if (totalTasks < MaxTask-1) 
+//	{
+//		context[totalTasks++].declare(code, userTaskEnd, name);
+//		++activeTasks;
+//		return true;
+//	}
+//	else	
+//		return false;
+//}
+
+int Parallelism::declareTask(void far* code, char name, int deadline, int cycles)
 {
 	// Insert a new task entry in SMARTS context array [ ]
-	if (totalTasks < MaxTask-1) 
+	if (totalTasks < MaxTask - 1)
 	{
-		context[totalTasks++].declare(code, userTaskEnd, name);
+		context[totalTasks++].declare(code, userTaskEnd, name, deadline, cycles);
 		++activeTasks;
 		return true;
 	}
-	else	
+	else
 		return false;
 }
+
+int Parallelism::getTaskDeadline(int taskNum) {
+	if (taskNum < totalTasks)
+		return context[taskNum].getTaskDeadline();
+	else
+		return -1; // or some error value
+}
+
+void Parallelism::updateDeadlines()
+{
+	for (int i = 0; i < totalTasks; i++) {
+		// TODO: check if this check is nesessary
+		if (context[i].getStatus() == READY) {
+			context[i].setDeadline(context[i].getDeadline() - 1);
+		}
+	}
+}
+
+
+/// **** End of Addition ****
 
 void Parallelism::runTheTasks()
 {
@@ -95,21 +130,21 @@ void Parallelism::runTheTasks()
 	asm	sti;	// yes interrupts
 }
 
-void Parallelism::callScheduler( )
+void Parallelism::callScheduler()
 {
 	// Return the control to the scheduler, this sets ON the software interrupt ProgInt flag
 	setProgInt( );
 	asm int timerInt;
 }
 
-void Parallelism::restoreSchedStack( )
+void Parallelism::restoreSchedStack()
 {
 	// Restore the scheduler stack
 	for (int i=MaxStack-1; i >= (MaxStack-14); i--)
 		contextSched.stack[i] = schedCopy[i];
 }
 
-int Parallelism::getCurrentTask( )
+int Parallelism::getCurrentTask()
 {	
 	return currentTask;
 }
@@ -121,23 +156,23 @@ void Parallelism::setCurrentTask(int taskNum)
 		currentTask = taskNum;
 }
 
-int Parallelism::getTotalTasks( )
+int Parallelism::getTotalTasks()
 {	
 	// Gets total tasks declared
 	return totalTasks;
 }
 
-int Parallelism::getDeadlock( )
+int Parallelism::getDeadlock()
 {	
 	return deadlock;
 }
 
-void Parallelism::setDeadlock( )
+void Parallelism::setDeadlock()
 {	
 	deadlock = true;
 }
 
-int Parallelism::contextSwitchOn( )
+int Parallelism::contextSwitchOn()
 {
 	// flag which enables context switch
 	if (endOfTimeSlice) //is current time slice finished ?
@@ -151,18 +186,18 @@ int Parallelism::contextSwitchOn( )
 	return 0;
 }
 
-void Parallelism::contextSwitchOff( )
+void Parallelism::contextSwitchOff()
 				// Disable context switch
 {	
 	contextSwitchFlag = false;
 }
 
-int Parallelism::getContextSwitch( )
+int Parallelism::getContextSwitch()
 {	
 	return contextSwitchFlag;
 }
 
-void Parallelism::setProgInt( )
+void Parallelism::setProgInt()
 {	
 	// flag indicates to the extern function 'timerInterruptHandler' 
 	// that this is an internal SMARTS software interrupt call, 
@@ -175,12 +210,12 @@ void Parallelism::resetProgInt()
 	progInt = false;
 }
 
-int Parallelism::getProgInt( )
+int Parallelism::getProgInt()
 {
 	return progInt;
 }
 
-void Parallelism::setEndOfTimeSlice( )
+void Parallelism::setEndOfTimeSlice()
 {	
 	// flag indicates that when 'context switch' will be enabled, 
 	// it must also return the control to the scheduler.
@@ -190,10 +225,10 @@ void Parallelism::setEndOfTimeSlice( )
 char Parallelism::getName(int taskNum)	
 {	
 	// returns name found or ' ' if not
-	return (taskNum <= totalTasks)? context[taskNum].name : ' ';
+	return (taskNum <= totalTasks) ? context[taskNum].name : ' ';
 }
 
-char Parallelism::getCurrentName( )
+char Parallelism::getCurrentName()
 {	
 	return context[currentTask].name;
 }
@@ -204,7 +239,7 @@ taskStatus Parallelism::getStatus(int taskNum)
 	return (taskNum <= totalTasks)? context[taskNum].status : UNDEFINED;
 }
 
-taskStatus Parallelism::getCurrentStatus( )
+taskStatus Parallelism::getCurrentStatus()
 {	
 	return context[currentTask].status;
 }
@@ -256,7 +291,7 @@ Event *Parallelism::getExpectedEvent(int taskNum)
 	return (taskNum <= totalTasks)? context[taskNum].expectedEvent : NULL;
 }
 
-Event *Parallelism::getCurrentExpectedEvent( )
+Event *Parallelism::getCurrentExpectedEvent()
 {	
 	return context[currentTask].expectedEvent;
 }
@@ -320,7 +355,7 @@ void Parallelism::handleTimers()
 
 }
 
-void Parallelism::taskEnd( )
+void Parallelism::taskEnd()
 {
 	// This function is called after the last operation of a task, instead of function return
 	SMARTS.setCurrentNotActive();
@@ -345,16 +380,34 @@ Task::Task()
 	currentPriority=priority=0;
 }
 
-void Task::declare(void far *code, void far *userTaskEnd, char name)
+/// **** Addition to the original code ****
+
+//void Task::declare(void far *code, void far *userTaskEnd, char name)
+//{
+//	stack[MaxStack-5]=FP_OFF(code);
+//	stack[MaxStack-4]=FP_SEG(code);
+//	stack[MaxStack-3]=_FLAGS;
+//	stack[MaxStack-2]=FP_OFF(userTaskEnd);
+//	stack[MaxStack-1]=FP_SEG(userTaskEnd);
+//	this->name= name;
+//	status = READY;
+//}
+
+void Task::declare(void far* code, void far* userTaskEnd, char name, int deadline, int cycles)
 {
-	stack[MaxStack-5]=FP_OFF(code);
-	stack[MaxStack-4]=FP_SEG(code);
-	stack[MaxStack-3]=_FLAGS;
-	stack[MaxStack-2]=FP_OFF(userTaskEnd);
-	stack[MaxStack-1]=FP_SEG(userTaskEnd);
-	this->name= name;
+	stack[MaxStack - 5] = FP_OFF(code);
+	stack[MaxStack - 4] = FP_SEG(code);
+	stack[MaxStack - 3] = _FLAGS;
+	stack[MaxStack - 2] = FP_OFF(userTaskEnd);
+	stack[MaxStack - 1] = FP_SEG(userTaskEnd);
+	this->name = name;
 	status = READY;
+	this->deadline = deadline;
+	this->originalDeadline = deadline;
+	this->cycles = cycles;
 }
+
+/// **** End of Addition ****
 
 void Task::incrPriority()
 {

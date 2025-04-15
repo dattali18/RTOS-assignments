@@ -1,6 +1,6 @@
 #include "smarts25.h"
 
-int roundRobin( )
+int roundRobin()
 {
 	// Round Robin short-term algorithm 
 	int count;
@@ -15,3 +15,29 @@ int roundRobin( )
 }
 
 
+/// **** Addition to the original code ****
+
+#define MAXINT 0xFFFF
+
+// edf - earliest deadline first
+int edf() 
+{
+	int next_task = -1;
+	unsigned int earliest_deadline = MAXINT;
+
+	for (int i = 0; i < SMARTS.getTotalTasks(); i++)
+	{
+		if (SMARTS.getStatus(i) == READY)
+		{
+			unsigned int deadline = SMARTS.getTaskDeadline(i);
+			if (deadline < earliest_deadline)
+			{
+				earliest_deadline = deadline;
+				next_task = i;
+			}
+		}
+	}
+
+	return next_task;
+}
+/// **** End of Addition ****
