@@ -17,8 +17,6 @@ int roundRobin()
 
 /// **** Addition to the original code ****
 
-#define MAXINT 0xFFFF
-
 // edf - earliest deadline first
 int edf() 
 {

@@ -34,7 +34,7 @@ void Parallelism::externalFunctions(void interrupt ( *timerInterruptHandler)(...
 	this->userTaskEnd = userTaskEnd;
 	this->algorithm = algorithm;
 	// prepare the stack of the scheduler task
-	contextSched.declare(scheduler, userTaskEnd, 'S');
+	contextSched.declare(scheduler, userTaskEnd, 'S', MAXINT, MAXINT);
 	for (int i=MaxStack-1; i >= (MaxStack-14); i--)
 		schedCopy[i]=contextSched.stack[i];
 }
@@ -78,7 +78,7 @@ void Parallelism::updateDeadlines()
 {
 	for (int i = 0; i < totalTasks; i++) {
 		// TODO: check if this check is nesessary
-		if (context[i].getStatus() == READY) {
+		if (context[i].status == READY) {
 			context[i].setDeadline(context[i].getDeadline() - 1);
 		}
 	}

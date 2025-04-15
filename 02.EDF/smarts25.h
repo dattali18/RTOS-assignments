@@ -150,9 +150,9 @@ public:
 
 	/// **** Addition to the original code ****
 	
-	void declareTask(void far* code, char name, int deadline, int cycles);
+	int declareTask(void far* code, char name, int deadline, int cycles);
 
-	int getTaskDeadline(int taskNum);
+	int getDeadline(int taskNum);
 
 	void redeclareTask(int taskNum);
 
