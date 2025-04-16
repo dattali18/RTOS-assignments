@@ -61,7 +61,7 @@ private:
 	int cycles; // the number of cycles of the task
 public:
 	void setDeadline(int d) { deadline = d; }
-	int getTaskDeadline() { return deadline; }
+	int getDeadline() { return deadline; }
 
 	void setOriginalDeadline(int d) { originalDeadline = d; }
 	int getOriginalDeadline() { return originalDeadline; }
@@ -152,9 +152,9 @@ public:
 	
 	int declareTask(void far* code, char name, int deadline, int cycles);
 
-	int getDeadline(int taskNum);
+	int getTaskDeadline(int taskNum);
 
-	void redeclareTask(int taskNum);
+	int redeclareTask(int taskNum);
 
 	void updateDeadlines();
 

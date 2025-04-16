@@ -1,6 +1,6 @@
 #include "smarts25.h"
 
-unsigned getTimerClocks( )
+unsigned getTimerClocks()
 {
 	// Gets the remaining clocks of the timer register
 	unsigned clocks;
@@ -69,7 +69,7 @@ int Parallelism::declareTask(void far* code, char name, int deadline, int cycles
 
 int Parallelism::getTaskDeadline(int taskNum) {
 	if (taskNum < totalTasks)
-		return context[taskNum].getTaskDeadline();
+		return context[taskNum].getDeadline();
 	else
 		return -1; // or some error value
 }
@@ -77,17 +77,29 @@ int Parallelism::getTaskDeadline(int taskNum) {
 void Parallelism::updateDeadlines()
 {
 	for (int i = 0; i < totalTasks; i++) {
-		// TODO: check if this check is nesessary
 		if (context[i].status == READY) {
-			context[i].setDeadline(context[i].getDeadline() - 1);
+			// check the current deadline is > 1
+			int deadline = context[i].getDeadline();
+			if(deadline > 1)
+				context[i].setDeadline(deadline - 1);
+			else {
+				// if deadline == 0
+				if(context[i].redclare())
+					context[i].status = READY;
+				else {
+					context[i].status = NOT_ACTIVE;
+					--activeTasks;
+				}
+			}
 		}
 	}
 }
 
-void Parallelism::redeclareTask(int taskNum) {
+int Parallelism::redeclareTask(int taskNum) {
 	if (taskNum < totalTasks) {
-		context[taskNum].redclare();
+		return context[taskNum].redclare();
 	}
+	return 0;
 }
 
 /// **** End of Addition ****
@@ -120,7 +132,7 @@ void Parallelism::runTheTasks()
 			cprintf("\n\n\rExit : deadlock");
 			break;
 		}
-		if (activeTasks==0)
+		if (activeTasks == 0)
 		{
 			cprintf("\n\n\rExit : finish");
 			break;
@@ -361,19 +373,7 @@ void Parallelism::handleTimers()
 
 void Parallelism::taskEnd()
 {
-	// redeclare current task
-	int currentTask = getCurrentTask();
-	// redeclare the task
-	if (SMARTS.redeclareTask(currentTask))
-	{
-		// task is still active
-		context[currentTask].status = READY;
-	}
-	else
-	{
-		// task is not active anymore
-		context[currentTask].status = NOT_ACTIVE;
-	}
+	SMARTS.setCurrentNotActive();
 	// This function is called after the last operation of a task, instead of function return
 	//SMARTS.setCurrentNotActive();
 	SMARTS.callScheduler();	// return the control to the scheduler to run a next task
@@ -427,14 +427,17 @@ void Task::declare(void far* code, void far* userTaskEnd, char name, int deadlin
 int Task::redclare()
 {
 	// Redefine the task with the original deadline and cycles
-	deadline = originalDeadline;
 	if (cycles > 1)
 	{
 		cycles = cycles - 1;
+		// recall declare task
+		status = READY;
+		deadline = originalDeadline;
 		return 1; // Task is still active
 	}
 	else
 	{
+		status = NOT_ACTIVE;
 		return 0; // Task is not active anymore
 	}
 }

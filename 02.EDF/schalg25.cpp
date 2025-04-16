@@ -28,6 +28,7 @@ int edf()
 		if (SMARTS.getStatus(i) == READY)
 		{
 			unsigned int deadline = SMARTS.getTaskDeadline(i);
+			if (deadline == 0 || deadline == -1) continue;
 			if (deadline < earliest_deadline)
 			{
 				earliest_deadline = deadline;

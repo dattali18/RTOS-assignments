@@ -55,7 +55,7 @@ void scheduler()
 	// calling to the 'short term scheduler' algorithm
 	nextTask = SMARTS.algorithm();
 
-		// checking for 'deadlock' : not found task to run and tasks remain suspended
+	// checking for 'deadlock' : not found task to run and tasks remain suspended
 	if (nextTask == SMARTS.getTotalTasks() && 
 			SMARTS.sleepTasks == 0 && SMARTS.activeTasks > 0)
 	{

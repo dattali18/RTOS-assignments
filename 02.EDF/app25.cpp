@@ -1,5 +1,7 @@
 #include "smarts25.h"
 
+#define BIG_N 10000
+
 // user Functions
 void a()
 {
@@ -8,7 +10,7 @@ void a()
 	SMARTS.contextSwitchOn();
 	for (int j = 0; j < 500; j++)
 	{
-		for (long i = 0; i < 600000; i++);
+		for (long i = 0; i < BIG_N; i++);
 		SMARTS.contextSwitchOff();
 		cout << "A";
 		SMARTS.contextSwitchOn();
@@ -25,7 +27,7 @@ void b()
 	SMARTS.contextSwitchOn();
 	for (int j = 0; j < 500; j++)
 	{
-		for (long i = 0; i < 600000; i++);
+		for (long i = 0; i < BIG_N; i++);
 		SMARTS.contextSwitchOff();
 		cout << "B";
 		SMARTS.contextSwitchOn();
@@ -42,7 +44,7 @@ void c()
 	SMARTS.contextSwitchOn();
 	for (int j = 0; j < 500; j++)
 	{
-		for (long i = 0; i < 600000; i++);
+		for (long i = 0; i < BIG_N; i++);
 		SMARTS.contextSwitchOff();
 		cout << "C";
 		SMARTS.contextSwitchOn();
@@ -56,10 +58,14 @@ void main()
 {
 	clrscr();
 	SMARTS.externalFunctions(timerInterruptHandler, scheduler, myTaskEnd, edf);
-	SMARTS.declareTask(a,'A', 5, 3);
-	SMARTS.declareTask(b,'B', 7, 4);
-	SMARTS.declareTask(c,'C', 10, 5);
+	SMARTS.declareTask(a,'A', 5, 1000);
+	SMARTS.declareTask(b,'B', 7, 1000);
+	SMARTS.declareTask(c,'C', 10, 1000);
 	SMARTS.runTheTasks();
+	// get input from user to stop the program
+	cout << "\n Press any key to stop the program";
+	char c;
+	cin >> c;
 }
 
 
